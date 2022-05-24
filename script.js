@@ -81,6 +81,7 @@ getCountryAndNeighbour('Pakistan');
 //   });
 // };
 
+/////////////////////////////////////////////////////////
 // const getCountry = function (country) {
 //   //Country 1
 //   fetch(`https://restcountries.com/v2/name/${country}`)
@@ -108,6 +109,7 @@ getCountryAndNeighbour('Pakistan');
 //   getCountry('pak');
 // });
 
+//////////////////////////////////////////////////////
 // const getCountry = function (country) {
 //   //Country 1
 //   getJSON(`https://restcountries.com/v2/name/${country}`, 'Country not found')
@@ -133,6 +135,7 @@ getCountryAndNeighbour('Pakistan');
 //     });
 // };
 
+/////////////////////////////////////////////////////////
 ///////challenge # 1
 // const whereAmI = function (lat, lng) {
 //   fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
@@ -162,41 +165,80 @@ getCountryAndNeighbour('Pakistan');
 // whereAmI(-33.933, 18.474);
 
 // getCountry('pak');
-
+////////////////////////////////////////////////////////
 ///////Promisifying
+// const getPosition = function () {
+//   return new Promise(function (resolve, reject) {
+//     navigator.geolocation.getCurrentPosition(resolve, reject);
+//   });
+// };
+// getPosition().then(pos => console.log(pos));
+
+/////////////////////////////////////////////////////////
+// const whereAmI = function () {
+//   getPosition()
+//     .then(pos => {
+//       const { latitude: lat, longitude: lng } = pos.coords;
+//       return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+//     })
+
+//     .then(response => {
+//       if (!response.ok)
+//         throw new Error(`problem with geocoding(
+//     ${response.status})`);
+//       return response.json();
+//     })
+//     .then(data => {
+//       console.log(data);
+//       console.log(` you are in ${data.city}, ${data.country}`);
+//       return fetch(`https://restcountries.com/v2/name/${data.country}`);
+//     })
+//     .then(res => {
+//       if (!res.ok)
+//         throw new Error(`country not found(
+//     ${res.status}
+//   )`);
+//       return res.json();
+//     })
+//     .then(data => renderCountry(data[0]))
+//     .catch(err => console.error(` ${err.message}🛴🚲🚲🛹🛹`));
+// };
+// btn.addEventListener('click', whereAmI);
+
+////////////////////////////////////////////////////
+//same whereAmI function with async await
+
 const getPosition = function () {
   return new Promise(function (resolve, reject) {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
 getPosition().then(pos => console.log(pos));
+const whereAmI = async function () {
+  try {
+    //Geolocation
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
 
-const whereAmI = function () {
-  getPosition()
-    .then(pos => {
-      const { latitude: lat, longitude: lng } = pos.coords;
-      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-    })
+    //reverse Geolocation
+    const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    if (!resGeo.ok) throw new Error('problem getting location data');
+    const dataGeo = await resGeo.json();
+    console.log(dataGeo);
 
-    .then(response => {
-      if (!response.ok)
-        throw new Error(`problem with geocoding(
-    ${response.status})`);
-      return response.json();
-    })
-    .then(data => {
-      console.log(data);
-      console.log(` you are in ${data.city}, ${data.country}`);
-      return fetch(`https://restcountries.com/v2/name/${data.country}`);
-    })
-    .then(res => {
-      if (!res.ok)
-        throw new Error(`country not found(
-    ${res.status}
-  )`);
-      return res.json();
-    })
-    .then(data => renderCountry(data[0]))
-    .catch(err => console.error(` ${err.message}🛴🚲🚲🛹🛹`));
+    //Country Data
+    const res = await fetch(
+      `https://restcountries.com/v2/name/${dataGeo.country}`
+    );
+    if (!res.ok) throw new Error('problem getting Country data');
+    const data = await res.json();
+    console.log(data);
+    renderCountry(data[0]);
+  } catch (err) {
+    // alert(err.message);
+    renderError(` ${err.message}`);
+  }
 };
-btn.addEventListener('click', whereAmI);
+
+whereAmI();
+whereAmI();
