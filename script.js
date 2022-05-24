@@ -71,15 +71,15 @@ getCountryAndNeighbour('Pakistan');
 //Fetch api
 //https://restcountries.com/v2/name/${country}
 
-// const getJSON = function (url, errorMsg = 'Something went wrong') {
-//   return fetch(url).then(res => {
-//     if (!res.ok)
-//       throw new Error(`${errorMsg}(
-//     ${res.status}
-//   )`);
-//     return res.json();
-//   });
-// };
+const getJSON = function (url, errorMsg = 'Something went wrong') {
+  return fetch(url).then(res => {
+    if (!res.ok)
+      throw new Error(`${errorMsg}(
+    ${res.status}
+  )`);
+    return res.json();
+  });
+};
 
 /////////////////////////////////////////////////////////
 // const getCountry = function (country) {
@@ -207,7 +207,7 @@ getCountryAndNeighbour('Pakistan');
 
 ////////////////////////////////////////////////////
 //same whereAmI function with async await
-
+/*
 const getPosition = function () {
   return new Promise(function (resolve, reject) {
     navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -242,3 +242,26 @@ const whereAmI = async function () {
 
 whereAmI();
 whereAmI();
+*/
+
+/////////////////////////////////////////////////////
+//Async await combinator get data of 3 countries
+const getCountries = async function (c1, c2, c3) {
+  try {
+    // const [data1] = await getJSON(`https://restcountries.com/v2/name/${c1}`);
+    // const [data2] = await getJSON(`https://restcountries.com/v2/name/${c2}`);
+    // const [data3] = await getJSON(`https://restcountries.com/v2/name/${c3}`);
+    // console.log([data1.capital, data2.capital, data3.capital]);
+
+    //combinator of promise
+    const data = await Promise.all([
+      getJSON(`https://restcountries.com/v2/name/${c1}`),
+      getJSON(`https://restcountries.com/v2/name/${c2}`),
+      getJSON(`https://restcountries.com/v2/name/${c3}`),
+    ]);
+    console.log(data.map(d => d[0].capital));
+  } catch (err) {
+    console.error(err);
+  }
+};
+getCountries('pak', 'afg', 'aus');
