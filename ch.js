@@ -1,17 +1,44 @@
 'use strict';
-const whereAmI = function (lat, lng) {
-  fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
-    .then(response => {
-      if (!response.ok)
-        throw new Error(`problem with geocoding(
-    ${response.status})`);
-      return response.json();
-    })
-    .then(data => {
-      console.log(data);
-      console.log(` you are in ${data.city}, ${data.country}`);
-    })
-    .catch(err => console.error(` ${err.message}🛴🚲🚲🛹🛹`));
+
+// challenge # 2
+// let img;
+const wait = function (second) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, second * 1000);
+  });
 };
-whereAmI(52.5081, 13.381);
-// whereAmI(-33.933, 18.474);
+const imgContainer = document.querySelector('.images');
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const img = document.createElement('img');
+    img.src = imgPath;
+    img.addEventListener('load', function () {
+      imgContainer.append(img);
+      resolve(img);
+    });
+    img.addEventListener('error', function () {
+      reject(new Error('Image not found'));
+    });
+  });
+};
+
+//wait resolve the promise
+let currentImg;
+createImage('img/img-1.jpg')
+  .then(img => {
+    currentImg = img;
+    console.log('image 1 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    // currentImg.style.opacity = 0;
+    currentImg.style.display = 'none';
+    return createImage('img/img-2.jpg');
+  })
+  .then(img => {
+    currentImg = img;
+    console.log('image 2  loaded');
+    return wait(2);
+  })
+  .then(() => (currentImg.style.display = 'none'))
+  .catch(err => console.error(err));
