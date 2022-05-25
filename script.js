@@ -265,3 +265,6 @@ const getCountries = async function (c1, c2, c3) {
   }
 };
 getCountries('pak', 'afg', 'aus');
+
+//////////////////////////////////////////////////////
+//promise.race,promis.allSettled,pormise.any
